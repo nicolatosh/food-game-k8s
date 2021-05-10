@@ -1,0 +1,39 @@
+<div class="d-flex justify-content-center">
+    <div class="row justify-content-center" id="infobox">
+        <h4>Game mode <span class="badge bg-secondary">{{gamemode}}</span></h4>
+        <h4>Game id <span class="badge bg-secondary">{{gameid}}</span></h4>
+        <h4>Nickname <span class="badge bg-secondary">{{usernick}}</span></h4>
+        <div [ngSwitch]="matchtype">
+            <h4 *ngSwitchCase="'rearrange_steps'" >Match type: <b>Order steps</b></h4>
+            <h4 *ngSwitchCase="'select_ingredients'" >Match type: <b>Select correct ingredients</b></h4>
+            <div *ngSwitchDefault>{{matchtype}}</div>
+        </div>
+    </div>
+</div>
+
+<div id="timerbox">
+    <h4>Remaining time {{timeleft}}</h4>
+    <div class="progress">
+        <div class="progress-bar bg-success" 
+            role="progressbar" [style.width.%]="[timeleft*10]" aria-valuenow="timeleft" aria-valuemin="0" aria-valuemax="100"></div>
+      </div>
+</div>
+
+<div *ngIf="wrongAnswer" id="wrongAnswer"><p id="wrongAnsMsg">Wrong answer!</p></div>
+<br>
+<div>
+    <div>
+        <h4><b>Recipe: </b>{{lastMatch['recipe_name']}}</h4>
+    </div>
+    <div class="row flex-row justify-content-center" *ngFor="let elem of 
+        lastMatch[matchtype === 'select_ingredients' ? 'scrambled_ingredients' : 'scrambled_steps']; let i = index">
+            <button href="#" id="{{i}}" type="button" class="btn btn-primary response_button" type="submit"
+            (click)="buildAnswer(elem,i)">{{elem}}</button>
+    </div>
+</div>
+
+<br>
+<div class="row flex-column justify-content-center">
+    <button type="submit" class="btn btn-success" type="button" id="sendButton"
+    (click)="sendAnswer()"><b>Send answer</b></button>
+</div>
