@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: recipes-db
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: recipes-db
+  template:
+    metadata:
+      labels:
+        app: recipes-db
+    spec:
+      containers:
+      - name: recipesdatabase
+        image: 172.24.4.1:5000/recipes-db
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 5000
+        volumeMounts:
+        - name: recipes-volume
+          mountPath: /food-game/recipes/data/
+        imagePullPolicy: Always
+      imagePullSecrets:
+      - name: regsecret 
+      volumes:
+      - name: recipes-volume
+        persistentVolumeClaim:
+          claimName: recipes-volume-claim
+
