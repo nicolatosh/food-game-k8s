@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: server
+  name: server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: server
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: server
+    spec:
+      containers:
+      - image: 172.24.4.1:5000/ng-server
+        name: ngserver
+        ports:
+          - name: ng-iternal
+            containerPort: 80
+        imagePullPolicy: Always
+      imagePullSecrets:
+      - name: regsecret
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: "server-accesspoint"
+  annotations:
+    # Create endpoints also if the related pod isn't ready
+    service.alpha.kubernetes.io/tolerate-unready-endpoints: "true"
+spec:
+  type: NodePort
+  ports:
+  - port: 80
+    nodePort: 30000
+    targetPort: 80
+  selector:
+    app: server
+
