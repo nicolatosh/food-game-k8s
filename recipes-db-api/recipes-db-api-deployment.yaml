@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: recipes-db-api
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: recipes-db-api
+  template:
+    metadata:
+      labels:
+        app: recipes-db-api
+    spec:
+      containers:
+      - name: recipesdatabase
+        image: 172.24.4.1:5000/recipes-db-api
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 5000
+        imagePullPolicy: Always
+      imagePullSecrets:
+      - name: regsecret 
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: "recipes-db-api-accesspoint"
+  annotations:
+    # Create endpoints also if the related pod isn't ready
+    service.alpha.kubernetes.io/tolerate-unready-endpoints: "true"
+spec:
+  type: NodePort
+  ports:
+  - port: 5000
+    nodePort: 30000
+    targetPort: 5000
+  selector:
+    app: recipes-db-api
+
+

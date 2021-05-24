@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: users-db-api
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: users-db-api
+  template:
+    metadata:
+      labels:
+        app: users-db-api
+    spec:
+      containers:
+      - name: recipesdatabase
+        image: 172.24.4.1:5000/users-db-api
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 5001
+        imagePullPolicy: Always
+      imagePullSecrets:
+      - name: regsecret 
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: "users-db-api-accesspoint"
+  annotations:
+    # Create endpoints also if the related pod isn't ready
+    service.alpha.kubernetes.io/tolerate-unready-endpoints: "true"
+spec:
+  type: NodePort
+  ports:
+  - port: 5001
+    nodePort: 30001
+    targetPort: 5001
+  selector:
+    app: users-db-api
+
+
