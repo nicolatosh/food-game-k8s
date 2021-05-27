@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: matchservice-api
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: matchservice-api
+  template:
+    metadata:
+      labels:
+        app: matchservice-api
+    spec:
+      containers:
+      - name: matchcontainer
+        image: 172.24.4.1:5000/matchservice
+        imagePullPolicy: Always
+        env:
+        # Define the environment variable
+          - name: RECIPES_ROUTE
+            valueFrom:
+              configMapKeyRef:
+                # The ConfigMap containing the value you want to assign to SPECIAL_LEVEL_KEY
+                name: recipesurl
+                # Specify the key associated with the value
+                key: RECIPES_ROUTE
+        ports:
+        - containerPort: 8080
+        imagePullPolicy: Always
+      imagePullSecrets:
+      - name: regsecret 
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: "matchservice-api-accesspoint"
+  annotations:
+    # Create endpoints also if the related pod isn't ready
+    service.alpha.kubernetes.io/tolerate-unready-endpoints: "true"
+spec:
+  type: NodePort
+  ports:
+  - port: 8080
+    nodePort: 30002
+    targetPort: 8080
+  selector:
+    app: matchservice-api
+

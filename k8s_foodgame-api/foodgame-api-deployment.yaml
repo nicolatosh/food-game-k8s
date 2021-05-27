@@ -1,0 +1,59 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: foodgame-api
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: foodgame-api
+  template:
+    metadata:
+      labels:
+        app: foodgame-api
+    spec:
+      containers:
+      - name: foodcontainer
+        image: 172.24.4.1:5000/foodgame-api:v8
+        imagePullPolicy: Always
+        env:
+        # Define the environment variable
+          - name: MATCH_SERVICE_URL
+            valueFrom:
+              configMapKeyRef:
+                # The ConfigMap containing the value you want to assign to SPECIAL_LEVEL_KEY
+                name: backendurls
+                # Specify the key associated with the value
+                key: MATCH_SERVICE_URL
+          - name: USER_SERVICE_URL
+            valueFrom:
+              configMapKeyRef:
+                name: backendurls
+                key: USER_SERVICE_URL
+        ports:
+        - containerPort: 80
+        imagePullPolicy: Always
+      imagePullSecrets:
+      - name: regsecret       
+      volumes:
+      - name: foodgame-vol
+        persistentVolumeClaim:
+          claimName: foodgame-pvc
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: "foodgame-api-accesspoint"
+  annotations:
+    # Create endpoints also if the related pod isn't ready
+    service.alpha.kubernetes.io/tolerate-unready-endpoints: "true"
+spec:
+  type: NodePort
+  ports:
+  - port: 80
+    nodePort: 30003
+    targetPort: 80
+  selector:
+    app: foodgame-api

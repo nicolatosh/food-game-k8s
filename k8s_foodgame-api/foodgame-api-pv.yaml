@@ -1,0 +1,15 @@
+ apiVersion: v1
+ kind: PersistentVolume
+ metadata:
+   name: food-pv
+ spec:
+   storageClassName: ""
+   capacity:
+     storage: 2Gi
+   accessModes:
+     - ReadWriteOnce
+   volumeMode: Block
+   persistentVolumeReclaimPolicy: Retain
+   claimRef:
+     namespace: default
+     name: foodgame-pvc

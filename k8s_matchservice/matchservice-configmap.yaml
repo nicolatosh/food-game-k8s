@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: recipesurl
+data:
+  RECIPES_ROUTE: "http://172.18.0.2:30000"
+
+
