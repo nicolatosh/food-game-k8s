@@ -3,5 +3,6 @@ WORKDIR /food_game_api
 COPY package*.json ./
 RUN npm install
 COPY . .
-EXPOSE 30000
+EXPOSE 80
+ENV NODE_ENV=production
 CMD [ "npm", "start" ]

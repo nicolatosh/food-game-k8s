@@ -8,7 +8,7 @@ from pymongo.errors import ConnectionFailure
 
 app = Flask(__name__)
 
-client = MongoClient('recipes_db', 27017)
+client = MongoClient('mongodb://root:food@recipes-db-mongodb-0.recipes-db-mongodb-headless')
 db = client.recipes_db
 collection = db.recipes
 

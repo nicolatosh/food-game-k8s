@@ -9,7 +9,7 @@ from bson.json_util import dumps
 
 app = Flask(__name__)
 
-client = MongoClient('user_db', 27017)
+client = MongoClient('mongodb://root:food@users-db-mongodb-0.users-db-mongodb-headless')
 db = client.user_db
 collection = db.user
 

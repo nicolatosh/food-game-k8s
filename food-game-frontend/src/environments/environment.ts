@@ -4,9 +4,13 @@
 
 const baseUrl = "localhost"
 const basePort = "30000"
-const apiBaseUrl = "http://" + baseUrl + ":" + basePort
+
+// This url is the combination of baseUrl + basePort
+// but since this app will run on k8s the actual backend url
+// will be given
+const apiBaseUrl = process.env.FOODGAME_URL
 export const environment = {
-  production: false,
+  production: true,
   apiLogin: apiBaseUrl + "/login",
   apiRegister: apiBaseUrl + "/register",
   apiMatchTypes: apiBaseUrl + "/matchtypes",
