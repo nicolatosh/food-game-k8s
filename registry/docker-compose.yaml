@@ -1,30 +1,31 @@
-registry:
-  container_name: private-docker-registry
-  restart: always
-  image: registry:2
-  net: host
-  ports:
-    - 5000:5000
-  environment:
-    REGISTRY_HTTP_TLS_CERTIFICATE: /certs/ca.crt
-    REGISTRY_HTTP_TLS_KEY: /certs/client.key
-    REGISTRY_AUTH: htpasswd
-    REGISTRY_AUTH_HTPASSWD_PATH: /auth/htpasswd
-    REGISTRY_AUTH_HTPASSWD_REALM: Registry Realm
-    REGISTRY_STORAGE: swift
-    REGISTRY_STORAGE_SWIFT_USERNAME: food
-    REGISTRY_STORAGE_SWIFT_PASSWORD: food
-    REGISTRY_STORAGE_SWIFT_AUTHURL: http://10.235.1.223/identity/v3/
-    REGISTRY_STORAGE_SWIFT_AUTHVERSION: 3
-    REGISTRY_STORAGE_SWIFT_DOMAIN: Default
-    REGISTRY_STORAGE_SWIFT_DOMAINID: default
-    REGISTRY_STORAGE_SWIFT_TENANT: docker-registry
-    REGISTRY_STORAGE_SWIFT_TENANTID: 6433a4a964bc42e28505ce6dc9c713a1
-    REGISTRY_STORAGE_SWIFT_INSECURESKIPVERIFY: "true"
-    REGISTRY_STORAGE_SWIFT_CONTAINER: test
-    REGISTRY_STORAGE_SWIFT_REGION: RegionOne
-    REGISTRY_STORAGE_SWIFT_ROOTDIRECTORY: /swift/object/name/prefix
-  volumes:
-    - ./certs:/certs
-    - ./auth:/auth
-    
+version:  "3.3"
+services:
+  registry:
+    container_name: private-docker-registry
+    restart: always
+    image: registry:2
+    ports:
+      - 5000:5000
+    environment:
+      REGISTRY_HTTP_TLS_CERTIFICATE: /certs/ca.crt
+      REGISTRY_HTTP_TLS_KEY: /certs/client.key
+      REGISTRY_AUTH: htpasswd
+      REGISTRY_AUTH_HTPASSWD_PATH: /auth/htpasswd
+      REGISTRY_AUTH_HTPASSWD_REALM: Registry Realm
+      REGISTRY_STORAGE: swift
+      REGISTRY_STORAGE_SWIFT_USERNAME: food
+      REGISTRY_STORAGE_SWIFT_PASSWORD: food
+      REGISTRY_STORAGE_SWIFT_AUTHURL: http://10.235.1.223/identity/v3/
+      REGISTRY_STORAGE_SWIFT_AUTHVERSION: 3
+      REGISTRY_STORAGE_SWIFT_DOMAIN: Default
+      REGISTRY_STORAGE_SWIFT_DOMAINID: default
+      REGISTRY_STORAGE_SWIFT_TENANT: docker-registry
+      REGISTRY_STORAGE_SWIFT_TENANTID: 6433a4a964bc42e28505ce6dc9c713a1
+      REGISTRY_STORAGE_SWIFT_INSECURESKIPVERIFY: "true"
+      REGISTRY_STORAGE_SWIFT_CONTAINER: test
+      REGISTRY_STORAGE_SWIFT_REGION: RegionOne
+      REGISTRY_STORAGE_SWIFT_ROOTDIRECTORY: /swift/object/name/prefix
+    volumes:
+      - ./certs:/certs
+      - ./auth:/auth
+
