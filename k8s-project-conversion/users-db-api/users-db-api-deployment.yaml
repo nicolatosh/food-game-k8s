@@ -29,7 +29,6 @@ kind: Service
 metadata:
   name: "users-db-api-accesspoint"
   annotations:
-    # Create endpoints also if the related pod isn't ready
     service.alpha.kubernetes.io/tolerate-unready-endpoints: "true"
 spec:
   type: NodePort

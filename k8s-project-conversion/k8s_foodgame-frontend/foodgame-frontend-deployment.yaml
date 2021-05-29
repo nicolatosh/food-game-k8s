@@ -15,16 +15,13 @@ spec:
     spec:
       containers:
       - name: foodcontainer
-        image: 172.24.4.1:5000/foodfrontend:v3
+        image: 172.24.4.1:5000/foodfrontend
         imagePullPolicy: Always
         env:
-        # Define the environment variable
           - name: BACKEND_URL
             valueFrom:
               configMapKeyRef:
-                # The ConfigMap containing the value you want to assign to SPECIAL_LEVEL_KEY
                 name: frontend
-                # Specify the key associated with the value
                 key: BACKEND_URL
         ports:
         - containerPort: 4200
@@ -38,7 +35,6 @@ kind: Service
 metadata:
   name: "frontend-accesspoint"
   annotations:
-    # Create endpoints also if the related pod isn't ready
     service.alpha.kubernetes.io/tolerate-unready-endpoints: "true"
 spec:
   type: NodePort

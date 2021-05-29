@@ -1,4 +1,4 @@
-# Food-game
+# Food-game is now on k8s!
 
 Welcome to FoodGame! This is a on-line game that challenge users with some delicious questions and is fully playable via REST api. It is made up by some different micro-services, each runs in a container solution.
 
@@ -12,59 +12,57 @@ Food game is able to:
 
 *To understand how each service works take a look to service specific documentation.*
 
-> Check *documentation* folder
-
-
-
 ---
+
+### Project deployment description
+
+The original project has been deployed on two different machines using new technology.
+
+> Check the folder **K8s-project-conversion** to see converted micro-services.
+
+There are two machines: **Iaas** and **paas**. 
+
+**PAAS**
+
+Here there is a Kind k8s multi-node-cluster.
+
+The original project has been reconverted to run on k8s taking advantage of its components:
+
+> Deployment, Services, Statefulsets, Config-maps, Secrets, Volumes (PV), Volumes claims (PVC) and much more were used. 
+
+Databases -> Mongo instances are installed thanks to ***Helm*** in replication mode.
+
+
+
+**How to deployments are started?**
+
+Automation has been added, k8s multi-node cluster and all its micro-services can be provisioned from IAAS machine thanks to ***Ansible***
+
+
+
+**IAAS**
+
+This machine runs an OpenStack instance. This project uses iaas machine to run:
+
++ Private docker registry with TLS and authentication
++ Custom registry volume using OpenStack Cinder
++ Management Dashboard with k8s Api
+
+**Docker registrty**
+
+So Iaas machine runs a docker registry with a cloud volume. 
+
+**Ansible** playbook has been configured to fire up all services in a fully automated way. 
+
+> Check **Ansible-sources** folder to find useful scripts
 
 
 
 ### Quick start
 
-Application is based on different technologies and frameworks so that Docker containers was adopted. The app can be seen as two separate stacks, each one running on a separate virtual machine. In source folder you will find two different *docker-compose files*.
-
-> *To run the application you should execute each compose "stack" in a separate virtual-machine*
-
-In order to simulate a pseudo-distributed system, the VMs run a portion of the app. In my setup I used two VMs connected to the same shared NAT network. You can use the pre-configured machines or build new ones. In any case i would like to spend few words to explain what is intended with a shaded Nat network.
-
-```
-Using VirtualBox follow these steps:
-
-1. Open File -> Preferencies -> Network
-2. Create a new custom Nat network
-3. Assign each machine to such network.
-
-Machines now will be able to reach each other meanwhile being on a different net. VirtualBox will provide us a virtual bridge.
-```
 
 
-
-###### Run with docker-compose
-
-In machine named "Ubuntu" 
-
-> VMs password = nicola
-
-```
-git clone https://ArpiNatoR@bitbucket.org/ArpiNatoR/sde.git
-cd sde
-sudo docker-compose -f docker-compose-backend up --build
-```
-
-In machine named "Ubuntu-frontend"
-
-```
-git clone https://ArpiNatoR@bitbucket.org/ArpiNatoR/sde.git
-cd sde
-sudo docker-compose -f docker-compose-frontend up --build
-```
-
-
-
->**Note**: we can also avoid to use pre-configured VMs with shared network. The only parameter to change is *BACKEND* env variable in *docker-compose-frontend.yml* file in which we need to specify what is the other machine address. Services will make calls at such address.
-
-Game is now accessible via front-end at **http://localhost:4200/**
++ TODO
 
 
 
@@ -92,4 +90,3 @@ Multi-player
 + If user sends a wrong answer waits till the opponent does his guess
 + if both users fail a match, the game is lost
 + Winner is the user that has achieved more won matches
-

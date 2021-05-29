@@ -3,7 +3,6 @@ kind: PersistentVolumeClaim
 metadata:
   name: foodgame-pvc
   labels:
-    # insert any desired labels to identify your claim
     app: foodgame-pvc
 spec:
   storageClassName: standard
@@ -11,6 +10,5 @@ spec:
     - ReadWriteOnce
   resources:
     requests:
-      # The amount of the volume's storage to request
       storage: 2Gi
 
