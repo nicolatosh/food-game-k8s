@@ -1,0 +1,91 @@
+- name: build-upload-images
+  hosts: localhost
+  vars:
+    reg: localhost:5000
+    certspath: ~/food-game-k8s/registry/certs
+  tasks:  
+
+    - name: What this playbook does?
+      ansible.builtin.debug:
+        msg: This playbook will build and push project images into docker private registry running locally.
+
+    - name: Get info on registry container
+      community.docker.docker_container_info:
+       name: private-docker-registry
+      register: result
+
+    - name: Does container exist?
+      ansible.builtin.debug:
+        msg: "The container {{ 'exists' if result.exists else 'does not exist' }}"
+
+    - name: Checking information about container
+      ansible.builtin.debug:
+        var: result.container
+      when: result.exists
+
+    - name: Aborting process
+      fail:
+        msg: Registry container not running! aborting tasks.
+      when: result.exists != True
+
+    - name: Building and pushing Recipes api
+      docker_image:
+        name: '{{reg}}/recipes-db-api'
+        source: build
+        ca_cert: '{{ certspath }}'
+        client_key: '{{ certspath }}'
+        client_cert: '{{ certspath }}'
+        build:
+          path: ~/food-game-k8s/recipes-db-adapter
+        state: present
+        push: yes
+
+    - name: Building and pushing Matchservice
+      docker_image:
+        name: '{{reg}}/matchservice'
+        source: build
+        ca_cert: '{{ certspath }}'
+        client_key: '{{ certspath }}'
+        client_cert: '{{ certspath }}'
+        build:
+          path: ~/food-game-k8s/matchservice
+        state: present
+        push: yes
+        
+    - name: Building and pushing Users api
+      docker_image:
+        name: '{{reg}}/users-db-api'
+        source: build
+        ca_cert: '{{ certspath }}'
+        client_key: '{{ certspath }}'
+        client_cert: '{{ certspath }}'
+        build:
+          path: ~/food-game-k8s/user-db-adapter
+        state: present
+        push: yes
+
+    - name: Building and pushing Foodgame api
+      docker_image:
+        name: '{{reg}}/foodgame-api'
+        source: build
+        ca_cert: '{{ certspath }}'
+        client_key: '{{ certspath }}'
+        client_cert: '{{ certspath }}'
+        build:
+          path: ~/food-game-k8s/food_game_api
+        state: present
+        push: yes
+    
+    - name: Building and pushing Food frontend
+      docker_image:
+        name: '{{reg}}/foodfrontend'
+        source: build
+        ca_cert: '{{ certspath }}'
+        client_key: '{{ certspath }}'
+        client_cert: '{{ certspath }}'
+        build:
+          path: ~/food-game-k8s/food-game-frontend
+        state: present
+        push: yes
+    
+

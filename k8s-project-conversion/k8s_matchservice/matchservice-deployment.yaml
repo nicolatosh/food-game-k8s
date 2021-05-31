@@ -1,8 +1,26 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: "matchservice-api-accesspoint"
+  namespace: food-game
+  annotations:
+    service.alpha.kubernetes.io/tolerate-unready-endpoints: "true"
+spec:
+  type: NodePort
+  ports:
+  - port: 8080
+    nodePort: 30002
+    targetPort: 8080
+  selector:
+    app: matchservice-api
+
+---
+
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: matchservice-api
-  namespace: default
+  namespace: food-game
 spec:
   replicas: 1
   selector:
@@ -29,19 +47,5 @@ spec:
       imagePullSecrets:
       - name: regsecret 
 
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: "matchservice-api-accesspoint"
-  annotations:
-    service.alpha.kubernetes.io/tolerate-unready-endpoints: "true"
-spec:
-  type: NodePort
-  ports:
-  - port: 8080
-    nodePort: 30002
-    targetPort: 8080
-  selector:
-    app: matchservice-api
+
 

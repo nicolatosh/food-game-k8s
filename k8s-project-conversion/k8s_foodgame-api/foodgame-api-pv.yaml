@@ -11,5 +11,5 @@
    volumeMode: Block
    persistentVolumeReclaimPolicy: Retain
    claimRef:
-     namespace: default
+     namespace: food-game
      name: foodgame-pvc

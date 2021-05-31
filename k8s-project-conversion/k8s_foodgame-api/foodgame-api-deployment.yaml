@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: foodgame-api
-  namespace: default
+  namespace: food-game
 spec:
   replicas: 1
   selector:

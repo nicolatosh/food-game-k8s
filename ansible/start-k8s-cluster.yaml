@@ -1,0 +1,102 @@
+- name: registry start
+  hosts: k8s-cluster
+  gather_facts: yes
+  tasks:
+    - name: Checking if Helm is installed
+      ansible.builtin.command: which helm
+      register: result
+
+    - name: Installing Helm
+      shell: |
+        cd $HOME
+        curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3
+        chmod 700 get_helm.sh
+        ./get_helm.sh
+        helm version
+      when: result != "/usr/local/bin/helm"
+
+    - name: Adding and updating bitnami repo
+      shell: |
+        helm repo add bitnami https://charts.bitnami.com/bitnami
+        helm repo update
+    
+    - name: Installing Python dependencies PyYaml, Openshift
+      shell: |
+        sudo apt install python-pip
+        pip install PyYAML
+        pip install openshift
+
+    - name: Create a k8s namespace food-game
+      community.kubernetes.k8s:
+        name: food-game
+        api_version: v1
+        kind: Namespace
+        state: present
+
+    - name: Installing MongoDB instance for recipes
+      community.kubernetes.helm:
+        name: recipes-db
+        chart_ref: bitnami/mongodb
+        release_namespace: food-game
+        values: "{{ lookup('template', '~/food-game-k8s/k8s-project-conversion/mongo-recipes-helm/mongodb-helm-conf.yaml') | from_yaml }}"
+
+    - name: Installing MongoDB instance for users
+      community.kubernetes.helm:
+        name: users-db
+        chart_ref: bitnami/mongodb
+        release_namespace: food-game
+        values: "{{ lookup('template', '~/food-game-k8s/k8s-project-conversion/mongo-user-helm/mongodb-helm-conf.yaml') | from_yaml }}"   
+
+    - name: Creating matchservice configmap
+      community.kubernetes.k8s:
+        state: present
+        namespace: food-game
+        src: ~/food-game-k8s/k8s-project-conversion/k8s_matchservice/matchservice-configmap.yaml
+
+    - name: Creating matchservice service
+      community.kubernetes.k8s:
+        state: present
+        namespace: food-game
+        src: ~/food-game-k8s/k8s-project-conversion/k8s_matchservice/matchservice-service.yaml
+
+    - name: Creating matchservice deployment
+      community.kubernetes.k8s:
+        state: present
+        namespace: food-game
+        src: ~/food-game-k8s/k8s-project-conversion/k8s_matchservice/matchservice-deployment.yaml
+
+    - name: Creating foodgame-api configmap
+      community.kubernetes.k8s:
+        state: present
+        namespace: food-game
+        src: ~/food-game-k8s/k8s-project-conversion/k8s_foodgame-api/foodgame-api-configmap.yaml
+
+    - name: Creating foodgame-api PVC
+      community.kubernetes.k8s:
+        state: present
+        namespace: food-game
+        src: ~/food-game-k8s/k8s-project-conversion/k8s_foodgame-api/foodgame-api-pvc.yaml
+
+    - name: Creating foodgame-api deployment
+      community.kubernetes.k8s:
+        state: present
+        namespace: food-game
+        src: ~/food-game-k8s/k8s-project-conversion/k8s_foodgame-api/foodgame-api-deployment.yaml
+
+    - name: Creating foodgame-frontend configmap
+      community.kubernetes.k8s:
+        state: present
+        namespace: food-game
+        src: ~/food-game-k8s/k8s-project-conversion/k8s_foodgame-frontend/foodgame-frontend-configmap.yaml
+
+    - name: Creating foodgame-frontend deployment
+      community.kubernetes.k8s:
+        state: present
+        namespace: food-game
+        src: ~/food-game-k8s/k8s-project-conversion/k8s_foodgame-frontend/foodgame-frontend-deployment.yaml
+
+
+
+
+
+
