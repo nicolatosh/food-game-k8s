@@ -1,6 +1,8 @@
 - name: registry start
   hosts: k8s-cluster
   gather_facts: yes
+  vars:
+    reg: 172.24.4.1:5000
   tasks:
     - name: Checking if Helm is installed
       ansible.builtin.command: which helm
@@ -33,31 +35,49 @@
         kind: Namespace
         state: present
 
+    - name: Logging to docker registry
+      shell: |
+        docker login https://172.24.4.1:5000
+        
+    - name: Creating secret for registry auth used in pods
+      shell: |
+        kubectl create secret docker-registry regsecret --namespace=food-game --docker-server=https://172.24.4.1:5000 --docker-username=food --docker-password=food --docker-email=test@example.com
+
     - name: Installing MongoDB instance for recipes
       community.kubernetes.helm:
         name: recipes-db
         chart_ref: bitnami/mongodb
         release_namespace: food-game
-        values: "{{ lookup('template', '~/food-game-k8s/k8s-project-conversion/mongo-recipes-helm/mongodb-helm-conf.yaml') | from_yaml }}"
-
+        values: "{{ lookup('file', '~/food-game-k8s/k8s-project-conversion/mongo-recipes-helm/mongodb-helm-conf.yaml') | from_yaml }}"
+   
     - name: Installing MongoDB instance for users
       community.kubernetes.helm:
         name: users-db
         chart_ref: bitnami/mongodb
         release_namespace: food-game
-        values: "{{ lookup('template', '~/food-game-k8s/k8s-project-conversion/mongo-user-helm/mongodb-helm-conf.yaml') | from_yaml }}"   
+        values: "{{ lookup('file', '~/food-game-k8s/k8s-project-conversion/mongo-user-helm/mongodb-helm-conf.yaml') | from_yaml }}"
 
+    - name: Adding certificates in Kind cluster
+      shell: |
+        kind-load-certificates.sh ca.crt 
+
+    - name: Creating recipes-db api
+      community.kubernetes.k8s:
+        state: present
+        namespace: food-game
+        src: ~/food-game-k8s/k8s-project-conversion/recipes-db-api/recipes-db-api-deployment.yaml 
+
+    - name: Creating users-db api
+      community.kubernetes.k8s:
+        state: present
+        namespace: food-game
+        src: ~/food-game-k8s/k8s-project-conversion/users-db-api/users-db-api-deployment.yaml 
+  
     - name: Creating matchservice configmap
       community.kubernetes.k8s:
         state: present
         namespace: food-game
         src: ~/food-game-k8s/k8s-project-conversion/k8s_matchservice/matchservice-configmap.yaml
-
-    - name: Creating matchservice service
-      community.kubernetes.k8s:
-        state: present
-        namespace: food-game
-        src: ~/food-game-k8s/k8s-project-conversion/k8s_matchservice/matchservice-service.yaml
 
     - name: Creating matchservice deployment
       community.kubernetes.k8s:
@@ -94,9 +114,5 @@
         state: present
         namespace: food-game
         src: ~/food-game-k8s/k8s-project-conversion/k8s_foodgame-frontend/foodgame-frontend-deployment.yaml
-
-
-
-
 
 

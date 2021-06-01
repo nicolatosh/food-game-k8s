@@ -1,0 +1,28 @@
+- name: registry start
+  hosts: localhost
+  gather_facts: no
+  vars:
+    reg: localhost:5000
+    user: food
+    password: food
+    registrypath: ~/food-game-k8s/registry
+  tasks:
+    - name: Moving to Registry folder project
+      command: 'chdir={{ registrypath }} ls'
+
+    - name: Starting registry build with docker compose
+      community.docker.docker_compose:
+        project_src: '{{ registrypath }}'
+        build: yes
+        state: present
+
+    - name: Log into private registry 
+      community.docker.docker_login:
+        registry_url: '{{ reg }}'
+        username: '{{ user }}'
+        password: '{{ password }}'
+        reauthorize: yes
+    
+    - name: Output
+      ansible.builtin.debug:
+        msg: Successfully started docker registry. Logged in!
