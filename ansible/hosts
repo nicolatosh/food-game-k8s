@@ -1,3 +1,4 @@
 [k8s-cluster]
 
-paaslab 
+paaslab        ansible_connection=ssh        ansible_user=nicola.arpino
+paaslab-eval        ansible_connection=ssh        ansible_user=eval

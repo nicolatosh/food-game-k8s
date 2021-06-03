@@ -19,7 +19,7 @@ while getopts n: OPT; do
 done
 shift "$((OPTIND - 1))"
 
-name="${name:-"nicola.arpino"}"
+name="${name:-"eval"}"
 
 if [[ $# -eq 0 ]]; then
   usage

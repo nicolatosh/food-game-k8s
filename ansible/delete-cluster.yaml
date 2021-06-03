@@ -1,5 +1,5 @@
-- name: registry start
-  hosts: k8s-cluster
+- name: Deleting cluster
+  hosts: paaslab-eval
   gather_facts: yes
   tasks:
     - name: Delete namespace food-game

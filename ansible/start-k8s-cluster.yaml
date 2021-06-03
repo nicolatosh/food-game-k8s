@@ -1,5 +1,5 @@
 - name: registry start
-  hosts: k8s-cluster
+  hosts: paaslab-eval
   gather_facts: yes
   vars:
     reg: 172.24.4.1:5000
@@ -35,6 +35,13 @@
         kind: Namespace
         state: present
 
+    - name: Updating docker certificates
+      shell: |
+        cd ~/../../
+        sudo mkdir -p /etc/docker/certs.d/{{reg}}
+        sudo cp ~/food-game-k8s/registry/certs/* ../../etc/docker/certs.d/{{reg}}
+        sudo cp ~/food-game-k8s/registry/certs/ca.crt ../../usr/local/share/ca-certificates 
+   
     - name: Logging to docker registry
       shell: |
         docker login https://172.24.4.1:5000
@@ -59,7 +66,8 @@
 
     - name: Adding certificates in Kind cluster
       shell: |
-        kind-load-certificates.sh ca.crt 
+       cd ~/food-game-k8s/ansible 
+       ./kind-load-certificates.sh ~/food-game-k8s/registry/certs/ca.crt 
 
     - name: Creating recipes-db api
       community.kubernetes.k8s:
