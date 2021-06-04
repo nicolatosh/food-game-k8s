@@ -2,3 +2,8 @@
 
 paaslab        ansible_connection=ssh        ansible_user=nicola.arpino
 paaslab-eval        ansible_connection=ssh        ansible_user=eval
+
+[iaas]
+
+iaaslab-eval        ansible_connection=ssh        ansible_user=eval
+

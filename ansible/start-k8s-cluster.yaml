@@ -132,13 +132,34 @@
     - name: Reading cluster connection info
       community.kubernetes.k8s_info:
         api_version: v1
-          kind: Secret
-          name: foodapp-user-secret
-          namespace: food-game
-        register: secret
+        kind: Secret
+        name: foodapp-user-secret
+        namespace: food-game
+      register: secret
+
+- hosts: paaslab-eval
+  tasks:
 
     - name: Connecting dashboard to k8s cluster
-      shell: |
-        cd ~/foodapp-dashboard-ansible
+      ansible.builtin.shell: echo $(kubectl get secret -n food-game foodapp-user-secret -o jsonpath="{.data.token}" | base64 --decode)
+      register: token
+
+    - name: Connecting dashboard to k8s cluster pt2
+      ansible.builtin.shell: echo $(kubectl config view --minify --raw --output 'jsonpath={..cluster.certificate-authority-data}')
+      register: cadata
+   
+    - name: Print return information from the previous task
+      ansible.builtin.debug:
+        var: cadata
+
+- hosts: iaaslab-eval
+  tasks:
+
+    - name: Copying files
+      ansible.builtin.shell:
+                             sed -i 's/K8S_CADATA=/K8S_CADATA=/I' ~/foodapp-dashboard-ansible/.env.backend;
+                             sed -i 's/K8S_TOKEN=/K8S_TOKEN=/I' ~/foodapp-dashboard-ansible/.env.backend;
+                             sed -i 's/K8S_CADATA=/K8S_CADATA={{hostvars['paaslab-eval']['cadata'].stdout}}/I' ~/foodapp-dashboard-ansible/.env.backend;
+                             sed -i 's/K8S_TOKEN=/K8S_TOKEN={{hostvars['paaslab-eval']['token'].stdout}}/I' ~/foodapp-dashboard-ansible/.env.backend
 
 
