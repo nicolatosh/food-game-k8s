@@ -1,7 +1,6 @@
 architecture: replicaset
 replicaCount: 2
 auth:
-    rootPassword: food
-
+  rootPassword: food
 service:
-    nodePort: 27027
+  nodePort: 27027

@@ -1,5 +1,5 @@
 architecture: replicaset
 replicaCount: 3
 auth:
-    rootPassword: food
+  rootPassword: food
 
